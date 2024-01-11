@@ -3,22 +3,12 @@ import os from 'os'
 import fs from 'fs'
 import path from 'path'
 import { getFileComments } from './getFileComments'
+import { moveFiles } from './fileHelpers'
 
 const dir = os.homedir() + '/Documents/.generation/testing/'
 // const dir = os.homedir() + '/coding/text-similarity/'
 
 // take file paths, and new directory name to put them in
-function moveFiles(filepaths, newDirname) {
-  const dirname = path.dirname(dir + 'test.jpg')
-  for (const filepath of filepaths) {
-    const basename = path.basename(filepath)
-    const from = `${dirname}/${basename}`
-    const to = `${newDirname}/${basename}`
-    console.log(`from:\t ${from}`)
-    console.log(`to:\t ${to}`)
-    fs.copyFileSync(from, to)
-  }
-}
 
 export default async function main() {
   console.log('Directory: ', dir)
@@ -100,7 +90,7 @@ export default async function main() {
   }
 
   for (let i = 0; i < groupedIdxes.filepathGroups.length; i++) {
-    moveFiles(groupedIdxes.filepathGroups[i], newDirnames[i])
+    moveFiles(dir, groupedIdxes.filepathGroups[i], newDirnames[i])
   }
   // for (const key of map.keys()) {
   //   if (map.get(key) >= runs * 0.08) console.log(key, map.get(key))
