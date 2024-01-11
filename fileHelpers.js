@@ -9,7 +9,7 @@ export function moveFiles(dir, filepaths, newDirname) {
     const basename = path.basename(filepath)
     const from = `${dirname}/${basename}`
     const to = `${newDirname}/${basename}`
-    fs.copyFileSync(from, to)
+    fs.renameSync(from, to)
   }
 }
 
@@ -30,7 +30,14 @@ export async function getFileComments(dir) {
   const userComments = []
   for (const filepath of filepaths) {
     const userComment = await getExifUserComment(filepath)
-    userComments.push(userComment.split('<')[0])
+    userComments.push(
+      userComment
+        .slice(8)
+        .replace(/[\n_:]/g, ' ')
+        .replace(/[\(\),\d\.<>-]/g, '')
+        .replace(')')
+        .split('Steps')[0]
+    )
   }
 
   return [userComments, filepaths]
