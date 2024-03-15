@@ -1,5 +1,19 @@
 {
+  "name": "text-similarity",
+  "module": "src/index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/command-line-args": "^5.2.3",
+    "@types/exif": "^0.6.5",
+    "@types/node": "^20.11.27"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
   "dependencies": {
+    "@types/node-kmeans": "^1.1.2",
+    "command-line-args": "^5.2.1",
     "exif": "^0.6.0",
     "exif-parser": "^0.1.12",
     "node-kmeans": "^1.1.9"
