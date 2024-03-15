@@ -15,7 +15,6 @@
     "@types/node-kmeans": "^1.1.2",
     "command-line-args": "^5.2.1",
     "exif": "^0.6.0",
-    "exif-parser": "^0.1.12",
     "node-kmeans": "^1.1.9"
   }
 }
