@@ -1,9 +1,13 @@
 import { getOpts } from "./opts";
-import { moveFilesToRoot } from "./fileHelpers";
+import { moveFilesToRoot, getAllFiles, getComments } from "./fileHelpers";
 
 main();
 
-function main() {
+async function main() {
   const { targetPath, runs, type } = getOpts();
   moveFilesToRoot(targetPath, type);
+
+  const files = getAllFiles(targetPath, type);
+  const comments = await getComments(files);
+  console.log(comments);
 }
