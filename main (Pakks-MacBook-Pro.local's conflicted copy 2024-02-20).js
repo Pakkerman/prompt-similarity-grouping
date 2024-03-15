@@ -5,29 +5,27 @@ import { getFileComments, moveFiles } from './fileHelpers'
 import { getSimilarity } from './cosineSimilarity'
 import { runKmeans } from './K-means'
 
-const args = process.argv.slice(2)
-console.log(args)
+console.log(`\n--- Grouping by prompt similarity ---\n`)
 
+const args = process.argv.slice(2)
 let dir = null
 let k = 3
 
 const pathRegex = /^(\/[.a-zA-Z0-9_-]+)+\/?$/
 const digitRegex = /^\d{1,2}$/
 args.forEach((item) => {
-  console.log(`curr: ${item}`)
   if (pathRegex.test(item)) {
-    console.log('mathc with path')
     dir = item
   } else if (digitRegex.test(item)) {
-    console.log('match with digit')
     k = +item
   }
 })
 
-console.log('\n --- Running K-means --- \n')
-console.log(`dir: ${dir}\nK=${k} with 250 runs`)
+console.log('\nRunning K-means with:')
+console.log(`dir: ${dir}\nK=${k} with 250 runs\n`)
 
 if (dir) main()
+
 export default async function main() {
   function moveJpgToDir() {
     const dirContent = fs
@@ -53,10 +51,8 @@ export default async function main() {
   moveJpgToDir()
 
   const [data, filepaths] = await getFileComments(dir)
-  // console.log(data)
 
   const similarity = getSimilarity(data)
-
   const runs = 250
   const kmeanResults = await runKmeans(similarity, k, runs)
 
