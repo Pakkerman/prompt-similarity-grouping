@@ -1,15 +1,27 @@
 import path from "path";
-import os from "os";
 import fs from "fs";
-import commandLineArgs from "command-line-args";
+import { getOpts } from "./opts";
 
-const config = [
-  { name: "runs", alias: "r", type: String },
-  { name: "path", alias: "p", type: String },
-];
-const opts = commandLineArgs(config);
+main();
 
-console.log(opts.path);
-console.log(path.dirname(opts.path));
-console.log(path.basename(opts.path));
+function main() {
+  const { targetPath, runs, type } = getOpts();
+  if (!targetPath || !fs.statSync(targetPath).isDirectory()) {
+    console.error("\nInvalid path\n");
+    return;
+  }
 
+  const files: string[] = [];
+  fs.readdirSync(targetPath, { withFileTypes: true, recursive: true }).forEach(
+    (item) => {
+      if (!item.isFile()) return;
+      if (path.extname(item.name) !== type) return;
+      files.push(path.join(targetPath, item.name));
+    },
+  );
+
+  console.log(files);
+  files.forEach((item) => {
+    fs.renameSync(item, path.join(targetPath, path.basename(item)));
+  });
+}
