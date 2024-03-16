@@ -36,7 +36,7 @@ async function main() {
     }
   });
 
-  let output = [];
+  let output: string[] = [];
   occurrencesMap.forEach((item) => {
     output.push({
       o: item.occurance,
