@@ -30,7 +30,6 @@ export function getAllFiles(targetPath: string, type: string): string[] {
 
     files.push(path.join(targetPath, item.name));
   });
-
   return files;
 }
 
@@ -39,28 +38,32 @@ export async function getComments(files: string[]): Promise<string[]> {
   for (let i = 0; i < files.length; i++) {
     comments.push(await getComment(files[i]));
   }
-
+  console.log(comments);
   return comments;
 
   async function getComment(file: string): Promise<string> {
     return new Promise((resolve, reject) => {
-      files.forEach((item) => {
-        new ExifImage({ image: item }, (err, data) => {
-          if (err) {
-            console.error(err);
-            reject(err);
-          } else {
-            const buffer = data.exif.UserComment;
-            if (!buffer) resolve("");
-            const comment = buffer!
-              .toString()
-              .slice(8)
-              .replaceAll(/[\n,]|<lora:|:-*\d\.\d>\.|BREAK/g, "")
-              .trim()
-              .replace(/Negative.*/g, "");
-            resolve(comment);
-          }
-        });
+      new ExifImage({ image: file }, (err, data) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+        } else {
+          const buffer = data.exif.UserComment;
+          if (!buffer) resolve("");
+          const comment = buffer!
+            .toString()
+            .slice(8)
+            .replaceAll(/[\n]/g, "")
+            .replace(/Negative.*/g, "")
+            .replaceAll(/,\s*/g, " ")
+            .replaceAll(/[\(\)]/g, "")
+            .replaceAll(/<lora:/g, " ")
+            .replaceAll(/:-*\d\.\d>\./g, "")
+            .replaceAll(/\s+/g, " ")
+            // .replaceAll(/[\n,]|<lora:|:-*\d\.\d>\.|BREAK/g, "")
+            .trim();
+          resolve(comment);
+        }
       });
     });
   }
