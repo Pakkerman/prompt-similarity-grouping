@@ -1,9 +1,16 @@
 import fs from "fs";
 import { getOpts } from "./opts";
-import { moveFilesToRoot, getAllFiles, getComments } from "./fileHelpers";
+import {
+  moveFilesToRoot,
+  getAllFiles,
+  getComments,
+  removeDir,
+  createDir,
+  moveFiles,
+} from "./fileHelpers";
 import { getSimilarity } from "./cosineSimilarity";
 import { runKmeans } from "./k-means";
-import path from "path";
+import type { Occurance, OccuranceMap } from "./types";
 
 main();
 
@@ -18,8 +25,7 @@ async function main() {
   const runs = 250;
   const kmeanResults = await runKmeans(similarityMatrix, clusters, runs);
 
-  const occurrencesMap: Map<string, { idxes: number[][]; occurance: number }> =
-    new Map();
+  const occurrencesMap: OccuranceMap = new Map();
   kmeanResults.forEach((item) => {
     const key = item
       .map((item) => item.length)
@@ -36,6 +42,16 @@ async function main() {
     }
   });
 
+  let mostOccurred: Occurance = { idxes: [], occurance: 0 };
+  for (const key of occurrencesMap.keys()) {
+    const entry = occurrencesMap.get(key)!;
+    if (mostOccurred.occurance < entry.occurance) {
+      mostOccurred = entry;
+    }
+  }
+
+  console.log(mostOccurred);
+
   let output: string[] = [];
   occurrencesMap.forEach((item) => {
     output.push({
@@ -48,18 +64,10 @@ async function main() {
     .sort((a, b) => a.o - b.o)
     .forEach((item) => console.log(item.o, "\t", item.i));
 
-  fs.readdirSync(targetPath, { withFileTypes: true }).forEach((item) => {
-    if (!item.isDirectory()) return;
+  removeDir(targetPath);
+  const targetDirs = createDir(targetPath, clusters);
 
-    const r = new RegExp(`${path.basename(targetPath)}-[0-9]{2}`);
-    if (!r.test(item.name)) return;
+  console.log(targetDirs);
 
-    fs.rmdirSync(path.join(targetPath, item.name));
-  });
-  // create new dirs
-  for (let i = 0; i < clusters; i++) {
-    fs.mkdirSync(
-      `${targetPath}${path.basename(targetPath)}-${(i + 1).toString().padStart(2, "0")}`,
-    );
-  }
+  moveFiles(targetDirs, files, mostOccurred);
 }

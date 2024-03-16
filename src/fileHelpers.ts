@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { ExifImage } from "exif";
+import type { Occurance } from "./types";
 
 export function moveFilesToRoot(targetPath: string, type: string): void {
   if (!targetPath || !fs.statSync(targetPath).isDirectory()) {
@@ -64,5 +65,47 @@ export async function getComments(files: string[]): Promise<string[]> {
         }
       });
     });
+  }
+}
+
+export function removeDir(targetPath: string): void {
+  fs.readdirSync(targetPath, { withFileTypes: true }).forEach((item) => {
+    if (!item.isDirectory()) return;
+
+    const r = new RegExp(`${path.basename(targetPath)}-[0-9]{2}`);
+    if (!r.test(item.name)) return;
+
+    fs.rmdirSync(path.join(targetPath, item.name));
+  });
+}
+export function createDir(targetPath: string, amount: number): string[] {
+  const out: string[] = [];
+  for (let i = 0; i < amount; i++) {
+    const dir = `${targetPath}${path.basename(targetPath)}-${(i + 1).toString().padStart(2, "0")}`;
+    fs.mkdirSync(dir);
+    out.push(dir);
+  }
+
+  return out;
+}
+
+export function moveFiles(
+  targetDirs: string[],
+  files: string[],
+  mostOccurred: Occurance,
+): void {
+  mostOccurred.idxes = mostOccurred.idxes.sort((a, b) => b.length - a.length);
+
+  for (let i = 0; i < targetDirs.length; i++) {
+    const currDir = targetDirs[i];
+    const idxes = mostOccurred.idxes[i];
+    console.log(currDir);
+    console.log(idxes);
+    for (let k = 0; k < idxes.length; k++) {
+      const idx = idxes[k];
+      const filename = path.basename(files[idx]);
+
+      fs.renameSync(files[idx], path.join(currDir, filename));
+    }
   }
 }
