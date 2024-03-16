@@ -38,7 +38,6 @@ export async function getComments(files: string[]): Promise<string[]> {
   for (let i = 0; i < files.length; i++) {
     comments.push(await getComment(files[i]));
   }
-  console.log(comments);
   return comments;
 
   async function getComment(file: string): Promise<string> {
@@ -54,13 +53,12 @@ export async function getComments(files: string[]): Promise<string[]> {
             .toString()
             .slice(8)
             .replaceAll(/[\n]/g, "")
-            .replace(/Negative.*/g, "")
-            .replaceAll(/,\s*/g, " ")
-            .replaceAll(/[\(\)]/g, "")
-            .replaceAll(/<lora:/g, " ")
+            .replace(/Negative.*/g, "") // Dont compare anything comes after Negative prompt
+            .replaceAll(/,\s*/g, " ") // replace all commas
+            .replaceAll(/[\(\)]/g, "") // replace all parenthesis
+            .replaceAll(/<lora:/g, " ") // replace inline lora formats, leave just the name
             .replaceAll(/:-*\d\.\d>\./g, "")
-            .replaceAll(/\s+/g, " ")
-            // .replaceAll(/[\n,]|<lora:|:-*\d\.\d>\.|BREAK/g, "")
+            .replaceAll(/\s+/g, " ") // get rid of extra spaces
             .trim();
           resolve(comment);
         }
