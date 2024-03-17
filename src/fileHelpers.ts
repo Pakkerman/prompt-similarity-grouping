@@ -12,7 +12,8 @@ export function moveFilesToRoot(targetPath: string, type: string): void {
   const files: string[] = [];
   fs.readdirSync(targetPath, { withFileTypes: true, recursive: true }).forEach(
     (item) => {
-      if (!item.isFile()) return;
+      if (item.isDirectory()) return;
+      if (item.name.indexOf("sorted") !== -1) return;
       if (path.extname(item.name) !== type) return;
       files.push(path.join(targetPath, item.name));
     },
@@ -75,7 +76,7 @@ export function removeDir(targetPath: string): void {
     const r = new RegExp(`${path.basename(targetPath)}-[0-9]{2}`);
     if (!r.test(item.name)) return;
 
-    fs.rmdirSync(path.join(targetPath, item.name));
+    fs.rmdirSync(path.join(targetPath, item.name), { recursive: true });
   });
 }
 export function createDir(targetPath: string, amount: number): string[] {
@@ -99,8 +100,6 @@ export function moveFiles(
   for (let i = 0; i < targetDirs.length; i++) {
     const currDir = targetDirs[i];
     const idxes = mostOccurred.idxes[i];
-    console.log(currDir);
-    console.log(idxes);
     for (let k = 0; k < idxes.length; k++) {
       const idx = idxes[k];
       const filename = path.basename(files[idx]);
