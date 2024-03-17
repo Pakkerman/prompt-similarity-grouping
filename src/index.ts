@@ -50,8 +50,6 @@ async function main() {
     }
   }
 
-  console.log(mostOccurred);
-
   let output: string[] = [];
   occurrencesMap.forEach((item) => {
     output.push({
@@ -66,8 +64,6 @@ async function main() {
 
   removeDir(targetPath);
   const targetDirs = createDir(targetPath, clusters);
-
-  console.log(targetDirs);
 
   moveFiles(targetDirs, files, mostOccurred);
 }
