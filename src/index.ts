@@ -10,8 +10,7 @@ import {
 import { getSimilarity } from "./cosineSimilarity";
 import { runKmeans } from "./k-means";
 import type { Occurance, OccuranceMap, Output } from "./types";
-import readline from "readline";
-import { pad } from "./helpers";
+import { pad, promptInput } from "./helpers";
 
 main();
 
@@ -98,18 +97,4 @@ async function main() {
   const targetDirs = createDir(targetPath, clusters);
 
   moveFiles(targetDirs, files, selectedMap);
-}
-
-// Function to prompt user for input
-function promptInput(question: string): Promise<string> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) => {
-    rl.question(question, (answer: string) => {
-      resolve(answer);
-      rl.close();
-    });
-  });
 }
