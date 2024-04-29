@@ -22,7 +22,7 @@ async function main() {
   const comments = await getComments(files);
   const similarityMatrix = getSimilarity(comments);
 
-  const runs = 250;
+  const runs = 300;
   const kmeanResults = await runKmeans(similarityMatrix, clusters, runs);
 
   const occurrencesMap: OccuranceMap = new Map();
@@ -50,7 +50,7 @@ async function main() {
     }
   }
 
-  const threshold = 2; // don't show less than
+  const threshold = 1; // don't show less than
   const average = Math.floor(files.length / clusters);
   let minDiffDist = average;
 
@@ -72,6 +72,7 @@ async function main() {
       diffDist,
     });
   }
+
   output = output.sort((a, b) => b.count - a.count);
 
   const groupOptions: string[] = [`|  id\toccured\tgrouping`];
@@ -79,7 +80,7 @@ async function main() {
     let str = `|${pad(idx + 1, 3)}): \t${pad(
       item.count,
       3,
-    )} => [${item.groups.map((n) => `${pad(n, 2)}`)}]`;
+    )} => [${item.groups.map((n) => `${pad(n, 2)}`)}] diff: ${minDiffDist}`;
 
     if (idx === 0) str += ` (most occured)`;
     if (item.diffDist === minDiffDist) str += ` (min diff dist)`;
