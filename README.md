@@ -1,15 +1,19 @@
-## Text Similarities Grouping
-### The problem
-  - Having too much fun hitting that button when generating AI images? You may find yourself drowning in hundreds of your own creations and dreading having to sort them later.
+## Prompt Similarities Grouping
 
+### The problem
+
+- Having too much fun hitting that button when generating AI images? You may find yourself drowning in hundreds of your own creations and dreading having to sort them later.
 
 ### Solution
-  - This thing is aim to automate this process with one command.
 
+- Use K-means grouping to sort files based on the prompt tokens
 
 ### Usage
-  - Work in progress.
 
-### Status
-  - Work in progress.
+```
+bun run src/index -p [path] -c [number of groups]
+```
 
+### TODOS
+
+- [x] Rewrite in TypeScript
