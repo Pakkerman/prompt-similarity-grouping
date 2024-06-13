@@ -50,7 +50,9 @@ export async function getComments(files: string[]): Promise<string[]> {
           reject(err);
         } else {
           const buffer = data.exif.UserComment;
-          if (!buffer) resolve("");
+          if (!buffer || buffer.toString() === "") {
+            resolve("");
+          }
           const comment = buffer!
             .toString()
             .slice(8)
