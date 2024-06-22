@@ -19,8 +19,11 @@ export async function runKmeans(
   ): Promise<ClusteringOutput[]> {
     return new Promise((resolve, reject) => {
       kmeans.clusterize(similarityMatrix, { k }, (err, res) => {
-        if (err) reject(err);
-        else resolve(res!);
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res!);
+        }
       });
     });
   }
