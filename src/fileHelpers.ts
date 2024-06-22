@@ -53,17 +53,14 @@ export async function getComments(files: string[]): Promise<string[]> {
           if (!buffer || buffer.toString() === "") {
             resolve("");
           }
+
           const comment = buffer!
             .toString()
-            .slice(8)
-            .replaceAll(/[\n]/g, "")
-            .replace(/Negative.*/g, "") // Dont compare anything comes after Negative prompt
-            .replaceAll(/,\s*/g, " ") // replace all commas
-            .replaceAll(/[\(\)]/g, "") // replace all parenthesis
-            .replaceAll(/<lora:/g, " ") // replace inline lora formats, leave just the name
-            .replaceAll(/:-*\d\.\d>\./g, "")
-            .replaceAll(/\s+/g, " ") // get rid of extra spaces
-            .trim();
+            .trim()
+            .replace(/Negative.*/g, "")
+            .replaceAll(/[^A-Za-z]+/g, " ")
+            .replaceAll(/\b(ems|lora|break|in|by|as)\b/gi, " ")
+            .replaceAll(/\s{2,}/g, " ");
           resolve(comment);
         }
       });
