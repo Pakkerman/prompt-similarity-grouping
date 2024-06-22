@@ -5,7 +5,13 @@ export function getSimilarity(data: string[]) {
     for (let k = 0; k < data.length; k++) {
       if (i === k) continue;
 
-      row.push(+calculateSimilarity(data[i], data[k]));
+      const result = +calculateSimilarity(data[i], data[k]);
+
+      if (Number.isNaN(result)) {
+        row.push(0.5);
+      } else {
+        row.push(result);
+      }
     }
 
     out.push(row);
