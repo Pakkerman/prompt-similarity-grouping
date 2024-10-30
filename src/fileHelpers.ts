@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { ExifImage } from "exif";
 import type { Occurance } from "./types";
+import { spawnSync } from "child_process";
 
 export function moveFilesToRoot(targetPath: string, type: string): void {
   if (!targetPath || !fs.statSync(targetPath).isDirectory()) {
@@ -36,36 +37,49 @@ export function getAllFiles(targetPath: string, type: string): string[] {
 }
 
 export async function getComments(files: string[]): Promise<string[]> {
+  const extractMetadata = path.join(
+    __dirname,
+    "..",
+    "scripts",
+    "extractMetadata.sh",
+  );
+
   const comments: string[] = [];
   for (let i = 0; i < files.length; i++) {
-    comments.push(await getComment(files[i]));
+    process.stdout.write(`\r Extracting data: ${i + 1} / ${files.length}`);
+    const test = spawnSync("bash", [extractMetadata, files[i]]);
+    const str = test.stdout.toString();
+
+    comments.push(str);
   }
   return comments;
 
-  async function getComment(file: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      new ExifImage({ image: file }, (err, data) => {
-        if (err) {
-          console.error(err);
-          reject(err);
-        } else {
-          const buffer = data.exif.UserComment;
-          if (!buffer || buffer.toString() === "") {
-            resolve("");
-          }
-
-          const comment = buffer!
-            .toString()
-            .trim()
-            .replace(/Negative.*/g, "")
-            .replaceAll(/[^A-Za-z]+/g, " ")
-            .replaceAll(/\b(ems|lora|break|in|by|as)\b/gi, " ")
-            .replaceAll(/\s{2,}/g, " ");
-          resolve(comment);
-        }
-      });
-    });
-  }
+  // async function getComment(file: string): Promise<string> {
+  //   return new Promise((resolve, reject) => {
+  //     new ExifImage({ image: file }, (err, data) => {
+  //       if (err) {
+  //         console.error(err);
+  //         reject(err);
+  //       } else {
+  //         const buffer = data.exif.UserComment;
+  //         if (!buffer || buffer.toString() === "") {
+  //           resolve("");
+  //         }
+  //
+  //         // const comment = buffer!
+  //         //   .toString()
+  //         //   .trim()
+  //         //   .replace(/Negative.*/g, "")
+  //         //   .replaceAll(/[^A-Za-z]+/g, " ")
+  //         //   .replaceAll(/\b(ems|lora|break|in|by|as)\b/gi, " ")
+  //         //   .replaceAll(/\s{2,}/g, " ");
+  //         //
+  //
+  //         resolve(comment);
+  //       }
+  //     });
+  //   });
+  // }
 }
 
 export function removeDir(targetPath: string): void {
@@ -78,6 +92,7 @@ export function removeDir(targetPath: string): void {
     fs.rmdirSync(path.join(targetPath, item.name), { recursive: true });
   });
 }
+
 export function createDir(targetPath: string, amount: number): string[] {
   const out: string[] = [];
   for (let i = 0; i < amount; i++) {
